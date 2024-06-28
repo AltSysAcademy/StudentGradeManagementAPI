@@ -7,7 +7,7 @@ import os
 from dotenv import load_dotenv
 
 from db import db
-from blocklist import BLOCKLIST
+from models import BlocklistModel
 
 def create_app():
     # Create the flask app
