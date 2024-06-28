@@ -9,4 +9,4 @@ class SubjectModel(db.Model):
     units = db.Column(db.Integer, unique=False, nullable=False)
 
     # Define a many-many relationship with students
-    students = db.relationship("StudentModel", back_populates="subjects", secondary="subject_student")
+    students = db.relationship("StudentModel", back_populates="subjects", secondary="subject_student", cascade='all, delete')

@@ -8,7 +8,6 @@ from schemas import SubjectSchema
 from sqlalchemy.exc import SQLAlchemyError
 
 from passlib.hash import pbkdf2_sha256
-from blocklist import BLOCKLIST
 
 
 blp = Blueprint("subjects", __file__, description="Operations on subjects."

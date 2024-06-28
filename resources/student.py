@@ -1,6 +1,6 @@
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
-from flask_jwt_extended import jwt_required, create_access_token, create_refresh_token, get_jwt
+from flask_jwt_extended import jwt_required, create_access_token, create_refresh_token, get_jwt_identity, get_jti
 
 from db import db
 from models import StudentModel, BlocklistModel
@@ -9,20 +9,21 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import or_
 
 from passlib.hash import pbkdf2_sha256
-from blocklist import BLOCKLIST
 
 
 blp = Blueprint("students", __file__, description="Operations on students."
 )
 
 '''
-/login     - POST   (Generate access, refresh)
-/logout    - POST   (Revoke access token)
-/refresh   - POST   (Generate non-fresh token)
-/register  - POST   (Create a new student model)
 
-/student - GET (Student info)
-/student - DELETE (Delete account)
+✅ /login     - POST   (Generate access, refresh)
+✅ /logout    - POST   (Revoke access token)
+✅ /refresh   - POST   (Generate non-fresh token)
+✅ /register  - POST   (Create a new student model)
+
+
+✅ /student - GET (Student info)
+✅ /student - DELETE (Delete account)
 
 /student/subject/<id> - GET (Get subject info by ID)
 /student/subject/<id> - POST (Enroll to a subject by ID)
@@ -31,6 +32,26 @@ blp = Blueprint("students", __file__, description="Operations on students."
 /student/subjects         - GET (GET ALL SUBJECTS)
 /student/subjects/average - GET (GET AVERAGE FROM ALL SUBJECTS)
 '''
+
+
+@blp.route("/student")
+class Student(MethodView):
+    @jwt_required()
+    @blp.response(200, StudentSchema)
+    def get(self):
+        student_id = get_jwt_identity()
+        student = StudentModel.query.get_or_404(student_id)
+        return student
+    
+    @jwt_required(fresh=True)
+    def delete(self):
+        student_id = get_jwt_identity()
+        student = StudentModel.query.get_or_404(student_id)
+        
+        db.session.delete(student)
+        db.session.commit()
+
+        return {"message": "Your account has been successfully deleted."}
 
 
 @blp.route('/register')
@@ -46,8 +67,8 @@ class StudentRegister(MethodView):
         student = StudentModel(
             name=student_info["name"],
             email=student_info["email"],
-            password=pbkdf2_sha256.hash(student_info["password"],
-            course=student_info["course"])
+            password=pbkdf2_sha256.hash(student_info["password"]),
+            course=student_info["course"]
         )
 
         db.session.add(student)
@@ -76,8 +97,7 @@ class UserLogout(MethodView):
     @jwt_required()
     def post(self):
         # GET JTI
-        jwt_jti = get_jwt()["jti"]
-
+        jwt_jti = get_jti()
         new_blocked_jti = BlocklistModel(jti=jwt_jti)
         db.session.add(new_blocked_jti)
         db.session.commit()

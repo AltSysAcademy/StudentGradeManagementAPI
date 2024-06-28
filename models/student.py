@@ -10,4 +10,4 @@ class StudentModel(db.Model):
     course = db.Column(db.String, unique=False, nullable=False)
 
     # Define a many-many relationship with subjects
-    subjects = db.relationship("SubjectModel", back_populates="students", secondary="subject_student")
+    subjects = db.relationship("SubjectModel", back_populates="students", secondary="subject_student", cascade='all, delete')

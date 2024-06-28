@@ -8,6 +8,8 @@ from dotenv import load_dotenv
 
 from db import db
 from models import BlocklistModel
+from resources.student import blp as StudentBlueprint
+from resources.subject import blp as SubjectBlueprint
 
 def create_app():
     # Create the flask app
@@ -38,13 +40,21 @@ def create_app():
     # Register the blueprints to API Documentation
     api = Api(app) 
 
-
+    api.register_blueprint(StudentBlueprint)
+    api.register_blueprint(SubjectBlueprint)
+    
 
     # SETUP A SECRET KEY FOR JWT
     app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
 
     # Create a JWT Manager Object
     jwt = JWTManager(app)
+
+    @jwt.additional_claims_loader
+    def add_claim_to_jwt(identity):
+        if identity == 1:
+            return {"is_admin": True}
+        return {"is_admin": False}
 
 
     return app
