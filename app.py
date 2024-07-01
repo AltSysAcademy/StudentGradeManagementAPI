@@ -11,9 +11,12 @@ from models import BlocklistModel
 from resources.student import blp as StudentBlueprint
 from resources.subject import blp as SubjectBlueprint
 
+from flask_cors import CORS
+
 def create_app():
     # Create the flask app
     app = Flask(__name__)
+    CORS(app)
 
     # Load all of the variables from .env
     load_dotenv()

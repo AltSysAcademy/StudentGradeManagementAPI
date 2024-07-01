@@ -11,3 +11,4 @@ class StudentModel(db.Model):
 
     # Define a many-many relationship with subjects
     subjects = db.relationship("SubjectModel", back_populates="students", secondary="subject_student", cascade='all, delete')
+    subject_students = db.relationship('SubjectStudent', back_populates='student', overlaps="subjects,students")

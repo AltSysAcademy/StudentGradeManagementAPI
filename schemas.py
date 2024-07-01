@@ -30,11 +30,12 @@ class SubjectAndStudentSchema(Schema):
     subject = fields.Nested(SubjectSchema())
 
 class GradeSchema(Schema):
+    student = fields.Nested(PlainStudentSchema(), dump_only=True)
     subject = fields.Nested(PlainSubjectSchema(), dump_only=True)
     prelims_grade = fields.Float(required=False)
     midterms_grade = fields.Float(required=False)
     finals_grade = fields.Float(required=False)
-    average_grade = fields.Float(required=False)
+    average_grade = fields.Float(required=False, dump_only=True)
 
 '''
 login user 1

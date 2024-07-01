@@ -11,6 +11,10 @@ class SubjectStudent(db.Model):
     midterms_grade = db.Column(db.Float, nullable=True)
     finals_grade = db.Column(db.Float, nullable=True)
 
+    # Add a new relationship to provide us with a subject and student
+    student = db.relationship('StudentModel', back_populates='subject_students', overlaps="subjects,students")
+    subject = db.relationship('SubjectModel', back_populates='subject_students', overlaps="students,subjects")
+
     @property
     def average_grade(self):
         grades = [self.prelims_grade, self.midterms_grade, self.finals_grade]
